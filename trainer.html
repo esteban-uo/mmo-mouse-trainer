@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Trainer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #ddd;
+    }
+
+    #value {
+      width: 0px;
+      height: 0px;
+      border: 0px;
+    }
+
+    #app {
+      margin-top: -6px;
+      display: grid;
+      grid-gap: 10px;
+      grid-template-columns: [col1-start] 1fr;
+      grid-template-rows: [row1-start] auto [row2-start] auto [row2-end];
+      color: rgb(39, 39, 39);
+    }
+
+    .box {
+      color: #fff;
+      border-radius: 5px;
+      font-size: 150%;
+      padding: 20px;
+    }
+
+    .history {
+      grid-column: col1-start;
+      grid-row: row2-start;
+      min-height: 30px;
+      color: #444;
+    }
+
+    .history> :first-child {
+      background: #fff;
+    }
+
+    .history p {
+      margin-bottom: 10px;
+      background: #ccc;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .randominput {
+      grid-column: col1-start;
+      grid-row: row1-start;
+      text-align: center;
+      height: 200px;
+      background-color: #444;
+    }
+
+    .correct-match {
+      background: #1b7964;
+    }
+
+    .incorrect-match {
+      background: #77231d;
+    }
+
+    h1 {
+      font-size: 6em;
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script>
+    $(function () {
+      var keyMapping = [
+        { value: 49, key: '1', errors: 0 },
+        { value: 50, key: '2', errors: 0 },
+        { value: 51, key: '3', errors: 0 },
+        { value: 52, key: '4', errors: 0 },
+        { value: 53, key: '5', errors: 0 },
+        { value: 54, key: '6', errors: 0 },
+        { value: 55, key: '7', errors: 0 },
+        { value: 56, key: '8', errors: 0 },
+        { value: 57, key: '9', errors: 0 },
+        { value: 48, key: '10', errors: 0 },
+        { value: 219, key: '11', errors: 0 },
+        { value: 221, key: '12', errors: 0 },
+      ]
+      var errors = 0
+      var $value = $('#value')
+      var $randominput__value = $('.randominput__value')
+      var $history__value = $('.history')
+      var randomNumber
+
+      function generateRandom() {
+        return Math.floor(Math.random() * 11)
+      }
+
+      function setRandomNumber() {
+        var newRandomNumber = generateRandom()
+        randomNumber = newRandomNumber == randomNumber ? generateRandom() : newRandomNumber
+        $randominput__value.text(keyMapping[randomNumber].key)
+      }
+
+      setRandomNumber()
+
+      $value.focus()
+      $value.focusout(function () { $value.focus() })
+
+      $value.keyup(function (e) {
+        var randomKeyMapping = keyMapping[randomNumber]
+        var keyCode = e.which
+
+        var input = keyMapping.find(function (keyMap) { return keyMap.value == keyCode })
+
+        if (!input) return
+
+        var match = keyCode == randomKeyMapping.value 
+
+        var boxMatchClass = match ? 'correct-match' : 'incorrect-match'
+
+        $randominput__value.parent().removeClass('correct-match incorrect-match').addClass(boxMatchClass)
+
+        if (!match) {
+          input.errors++
+
+          var inputReadble = input.key
+          var textHistory = '<p>Pressed: ' + inputReadble + ' (' + input.errors + 'x wrong times) / Expected: <b>' + randomKeyMapping.key + '</b> </p>'
+
+          $history__value.prepend(textHistory)
+        }
+
+        setRandomNumber()
+      })
+    })
+  </script>
+</head>
+
+<body>
+  <input type="" id="value" />
+  <div id="app">
+    <div class="box randominput">
+      <h1 class="randominput__value"></h1>
+    </div>
+    <div class="box history"></div>
+  </div>
+</body>
+</html>
